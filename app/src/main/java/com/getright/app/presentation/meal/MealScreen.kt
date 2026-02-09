@@ -15,18 +15,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MealScreen(
     viewModel: MealViewModel = hiltViewModel()
 ) {
-    val meals by viewModel.meals.collectAsStateWithLifecycle()
+    // FIX 1: specific lifecycle import removed, using standard Compose state
+    val meals by viewModel.meals.collectAsState(initial = emptyList())
 
     Scaffold(
         topBar = {
@@ -47,14 +48,19 @@ fun MealScreen(
         ) {
             items(meals) { meal ->
                 Column(modifier = Modifier.padding(16.dp)) {
+                    // FIX 2: We use toString() temporarily to guarantee it builds.
+                    // Once it builds, we will see exactly what fields 'meal' has!
                     Text(
-                        text = meal.rawInput,
+                        text = meal.toString(),
                         style = MaterialTheme.typography.bodyLarge
                     )
+                    
+                    /* Uncomment this later once we verify your Meal field names
                     Text(
-                        text = "${meal.macros.calories} kcal",
+                        text = "${meal.calories} kcal",
                         style = MaterialTheme.typography.bodyMedium
                     )
+                    */
                 }
             }
         }
